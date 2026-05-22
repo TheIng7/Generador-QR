@@ -41,3 +41,124 @@ All commands are run from the root of the project, from a terminal:
 ## 👀 Want to learn more?
 
 Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+
+PASO  6: RESPUESTAS A LAS PREGUNTAS
+
+https://generador-qr-7zxf.vercel.app/
+
+1. Que diferencia hay entre método GET y POST en un formulario HTML? Por que usamos POST aquí?
+
+En HTML, los métodos GET y POST se utilizan para enviar información desde el navegador hacia el servidor, pero cada uno funciona de manera diferente y tiene distintos objetivos.
+
+El método GET envía los datos directamente en la URL mediante parámetros visibles. Por ejemplo:
+
+https://misitio.com/?texto=Hola
+
+En este caso, el valor “Hola” queda expuesto en la barra de direcciones del navegador. Esto tiene varias ventajas: las URLs pueden compartirse fácilmente, guardarse en favoritos o reutilizarse. Por eso GET es muy utilizado en motores de búsqueda, filtros y páginas donde la información no es sensible.
+
+Sin embargo, GET también tiene limitaciones importantes:
+
+Los datos son visibles públicamente.
+La información queda almacenada en el historial del navegador.
+Tiene restricciones de longitud en la URL.
+No es recomendable para datos privados o formularios complejos.
+
+Por otro lado, el método POST envía la información dentro del cuerpo de la petición HTTP y no directamente en la URL. Esto permite enviar datos de forma más organizada y segura.
+
+En el proyecto del generador de códigos QR se utiliza POST porque el usuario está enviando información al servidor para procesarla dinámicamente antes de generar una respuesta. En este caso, el servidor recibe el texto o URL ingresado, lo valida y luego genera el código QR correspondiente.
+
+Además, POST es más adecuado porque:
+
+evita mostrar información en la URL,
+permite manejar textos más largos,
+mejora la organización de los datos enviados,
+y facilita futuras ampliaciones del sistema, como autenticación o almacenamiento en base de datos.
+
+Por ejemplo, si un usuario quisiera generar un QR para un enlace privado de una empresa o un documento interno, sería mejor utilizar POST para evitar exponer ese contenido directamente en la barra del navegador.
+
+Desde la perspectiva de ingeniería informática, GET suele utilizarse para consultar recursos, mientras que POST se utiliza para enviar o procesar información dentro de una aplicación web.
+
+2. La URL del QR generado es predecible: cualquiera puede construirla. Es eso un problema de seguridad? En que caso si y en que caso no?
+
+En este proyecto, el código QR se genera mediante una API externa que recibe el texto a través de parámetros en la URL. Por ejemplo:
+
+https://api.qrserver.com/v1/create-qr-code/?data=Hola
+
+Esto significa que cualquier persona podría modificar manualmente el parámetro data y generar otros códigos QR diferentes. Técnicamente, esto hace que la URL sea “predecible”.
+
+En el contexto actual del proyecto, esto no representa un problema grave de seguridad porque únicamente se están manejando datos públicos o textos simples. El sistema no contiene:
+
+usuarios autenticados,
+información privada,
+tokens de acceso,
+datos bancarios,
+ni información confidencial.
+
+Por ejemplo, si un usuario genera un QR para:
+
+https://youtube.com
+
+no existe un riesgo importante en que otra persona pueda reconstruir esa URL manualmente.
+
+Sin embargo, la situación cambiaría completamente si el sistema manejara información sensible.
+
+Por ejemplo, sería peligroso si el QR incluyera:
+
+enlaces privados,
+identificadores de sesión,
+contraseñas,
+accesos temporales,
+datos personales,
+o documentos restringidos.
+
+En esos casos, un atacante podría intentar modificar parámetros manualmente y acceder a recursos que no debería visualizar.
+
+Un ejemplo real ocurre en algunos sistemas mal diseñados donde las URLs contienen identificadores consecutivos:
+
+/documento?id=100
+/documento?id=101
+/documento?id=102
+
+Si no existe validación de permisos, un usuario podría acceder a documentos ajenos simplemente cambiando el número de la URL. Esto se conoce como vulnerabilidad de exposición de recursos o acceso inseguro a objetos.
+
+Por esa razón, aunque en este proyecto educativo la predictibilidad de la URL no representa un riesgo importante, en sistemas reales se recomienda implementar:
+
+autenticación,
+autorización,
+tokens únicos,
+cifrado,
+o identificadores aleatorios.
+
+Desde la perspectiva de seguridad informática, el problema no es que la URL sea visible, sino qué tipo de información protege y qué permisos existen detrás de ella.
+
+3. Como guardarías el historial de QR generados entre sesiones del usuario?
+
+Actualmente, el historial del proyecto es temporal. Esto significa que los códigos QR desaparecen cuando: el usuario, recarga la página, cierra el navegador,
+o el servidor reinicia la aplicación.
+
+Esto sucede porque no existe un sistema de almacenamiento persistente.
+
+Para conservar el historial entre sesiones existen varias soluciones posibles dependiendo del tamaño y complejidad del sistema.
+
+La opción más profesional sería utilizar una base de datos, como:
+
+MongoDB,
+PostgreSQL,
+MySQL,
+o Firebase.
+
+En ella podrían almacenarse datos como:
+
+el texto generado,
+la URL del QR,
+fecha y hora,
+usuario asociado,
+cantidad de descargas,
+e incluso estadísticas de uso.
+
+| ID | Texto                                    | Fecha      |
+| -- | ---------------------------------------- | ---------- |
+| 1  | (https://google.com)                     | 2026-05-21 |
+| 2  | (https://youtube.com)                    | 2026-05-22 |
+
+Esta solución permite que el historial permanezca incluso después de apagar el servidor o cerrar sesión.
