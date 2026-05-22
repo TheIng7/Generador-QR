@@ -1,0 +1,62 @@
+---
+import Layout from './layouts/Layout.astro';
+
+const texto = Astro.url.searchParams.get('texto') ?? '';
+const qrUrl = texto
+  ? `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(texto)}&color=A78BFA&bgcolor=0F0F13`
+  : null;
+---
+
+<Layout title="QR compartido">
+<style>
+  .card {
+    background: #16161D;
+    border: 1px solid #1E1E2A;
+    border-radius: 16px;
+    padding: 2rem;
+    text-align: center;
+  }
+  .card h1 { font-size: 20px; font-weight: 600; color: #A78BFA; margin-bottom: 1.5rem; }
+  .qr-frame {
+    background: #0F0F13;
+    border: 1px solid #1E1E2A;
+    border-radius: 12px;
+    padding: 1rem;
+    display: inline-block;
+    margin-bottom: 1rem;
+  }
+  .qr-frame img { width: 220px; height: 220px; display: block; }
+  .url-text { font-size: 13px; color: #475569; word-break: break-all; margin-bottom: 1.5rem; }
+  .btn {
+    display: inline-block;
+    padding: 11px 28px;
+    background: #7C3AED;
+    color: #fff;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+  }
+  .btn:hover { background: #6D28D9; }
+  .empty { color: #64748B; }
+  .empty a { color: #A78BFA; }
+</style>
+
+  <div class="card">
+    <h1>🔗 QR compartido</h1>
+    {qrUrl ? (
+      <>
+        <div class="qr-frame">
+          <img src={qrUrl} alt="QR compartido" />
+        </div>
+        <p class="url-text">{texto}</p>
+        <a href={qrUrl} download="qr-compartido.png" class="btn">⬇ Descargar QR</a>
+      </>
+    ) : (
+      <p class="empty">
+        No se especificó ningún texto. <a href="/">Generar uno nuevo →</a>
+      </p>
+    )}
+  </div>
+
+</Layout>

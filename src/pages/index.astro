@@ -1,17 +1,216 @@
 ---
+import Layout from './layouts/Layout.astro';
 
+let qrUrl    = null;
+let texto    = '';
+let tamano   = '200';
+let color    = 'A78BFA';
+let error    = null;
+
+if (Astro.request.method === 'POST') {
+  const data = await Astro.request.formData();
+  texto  = (data.get('texto')  ?? '').toString().trim();
+  tamano = (data.get('tamano') ?? '200').toString();
+  color  = (data.get('color')  ?? 'A78BFA').toString();
+
+  if (!texto) {
+    error = 'Escribe una URL o texto para generar el QR.';
+  } else {
+    qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${tamano}x${tamano}&data=${encodeURIComponent(texto)}&color=${color}&bgcolor=0F0F13`;
+  }
+}
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Layout title="Generador de QR">
+
+<style>
+  .hero { text-align: center; margin-bottom: 2rem; }
+  .hero-icon {
+    width: 52px; height: 52px;
+    background: #1E1B2E;
+    border: 1px solid #312E5A;
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 14px;
+    font-size: 26px;
+  }
+  .hero h1 { font-size: 22px; font-weight: 600; color: #F1F5F9; margin-bottom: 6px; }
+  .hero p  { font-size: 14px; color: #64748B; }
+
+  .card {
+    background: #16161D;
+    border: 1px solid #1E1E2A;
+    border-radius: 16px;
+    padding: 1.75rem;
+  }
+  .field { margin-bottom: 14px; }
+  .field label {
+    display: block;
+    font-size: 11px;
+    color: #64748B;
+    margin-bottom: 6px;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+  }
+  .field input, .field select {
+    width: 100%;
+    padding: 11px 14px;
+    font-size: 15px;
+    background: #0F0F13;
+    border: 1px solid #1E1E2A;
+    border-radius: 10px;
+    color: #E2E8F0;
+    outline: none;
+    font-family: inherit;
+    transition: border-color .15s;
+  }
+  .field input:focus, .field select:focus { border-color: #7C3AED; }
+  .field input::placeholder { color: #334155; }
+  .field select { font-size: 13px; cursor: pointer; }
+
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  .btn-gen {
+    width: 100%;
+    padding: 13px;
+    font-size: 15px;
+    font-weight: 600;
+    background: #7C3AED;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    margin-top: 4px;
+    font-family: inherit;
+    transition: background .15s;
+  }
+  .btn-gen:hover { background: #6D28D9; }
+
+  .error { color: #F87171; font-size: 14px; margin-bottom: 12px; }
+
+  .divider { height: 1px; background: #1E1E2A; margin: 1.75rem 0; }
+
+  .result {
+    display: grid;
+    grid-template-columns: 168px 1fr;
+    gap: 1.5rem;
+    align-items: start;
+  }
+  .qr-frame {
+    background: #0F0F13;
+    border: 1px solid #1E1E2A;
+    border-radius: 12px;
+    padding: 14px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .qr-frame img { width: 140px; height: 140px; display: block; border-radius: 6px; }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: #1A1F2E;
+    color: #818CF8;
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    border: 1px solid #2E3461;
+    margin-bottom: 10px;
+  }
+  .res-url {
+    font-size: 12px;
+    color: #475569;
+    word-break: break-all;
+    line-height: 1.6;
+    margin-bottom: 14px;
+  }
+  .btn-dl, .btn-share {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 9px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    width: 100%;
+    cursor: pointer;
+    font-family: inherit;
+    text-decoration: none;
+    margin-bottom: 8px;
+    transition: background .15s;
+  }
+  .btn-dl    { background: #7C3AED; color: #fff; border: none; }
+  .btn-dl:hover { background: #6D28D9; }
+  .btn-share { background: transparent; color: #94A3B8; border: 1px solid #1E1E2A; }
+  .btn-share:hover { background: #1E1E2A; color: #E2E8F0; }
+</style>
+
+  <div class="hero">
+    <div class="hero-icon">&#9641;</div>
+    <h1>Generador de códigos QR</h1>
+    <p>Convierte cualquier URL o texto en un código QR descargable</p>
+  </div>
+
+  <div class="card">
+    <form method="POST">
+      <div class="field">
+        <label for="texto">URL o texto</label>
+        <input
+          id="texto" name="texto" type="text"
+          value={texto}
+          placeholder="https://ejemplo.com o cualquier texto..."
+        />
+      </div>
+
+      <div class="grid2">
+        <div class="field">
+          <label>Tamaño</label>
+          <select name="tamano">
+            <option value="150">Pequeño 150×150</option>
+            <option value="200" selected>Mediano 200×200</option>
+            <option value="300">Grande 300×300</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Color QR</label>
+          <select name="color">
+            <option value="E2E8F0">Blanco claro</option>
+            <option value="A78BFA" selected>Morado suave</option>
+            <option value="818CF8">Índigo</option>
+            <option value="34D399">Verde menta</option>
+          </select>
+        </div>
+      </div>
+
+      {error && <p class="error">{error}</p>}
+
+      <button type="submit" class="btn-gen">&#9641; Generar QR</button>
+    </form>
+
+    {qrUrl && (
+      <>
+        <div class="divider"></div>
+        <div class="result">
+          <div class="qr-frame">
+            <img src={qrUrl} alt="Código QR generado" />
+          </div>
+          <div>
+            <div class="badge">✓ Generado</div>
+            <p class="res-url">{texto}</p>
+            <a href={qrUrl} download="mi-qr.png" class="btn-dl">
+              ⬇ Descargar PNG
+            </a>
+            
+              href={`/historial?texto=${encodeURIComponent(texto)}`}
+              class="btn-share"
+            >
+              🔗 Copiar enlace compartible
+            </a>
+          </div>
+        </div>
+      </>
+    )}
+  </div>
+
+</Layout>

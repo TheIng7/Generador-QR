@@ -1,0 +1,59 @@
+---
+const { title } = Astro.props;
+---
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title} — QR Generator</title>
+    <style>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        font-family: system-ui, -apple-system, sans-serif;
+        background: #0F0F13;
+        color: #E2E8F0;
+        min-height: 100vh;
+        padding: 2rem 1rem;
+      }
+      main { max-width: 580px; margin: auto; }
+      nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 2.5rem;
+      }
+      .nav-brand {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 15px;
+        font-weight: 500;
+        color: #E2E8F0;
+        text-decoration: none;
+      }
+      .nav-brand span { color: #A78BFA; font-size: 20px; }
+      .nav-links { display: flex; gap: 1.5rem; }
+      .nav-links a {
+        font-size: 13px;
+        color: #64748B;
+        text-decoration: none;
+        transition: color .15s;
+      }
+      .nav-links a:hover { color: #E2E8F0; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <nav>
+        <a class="nav-brand" href="/">
+          <span>&#9641;</span> QR Generator
+        </a>
+        <div class="nav-links">
+          <a href="/">Inicio</a>
+          <a href="/historial">Compartir QR</a>
+        </div>
+      </nav>
+      <slot />
+    </main>
+  </body>
+</html>
